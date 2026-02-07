@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600&family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        :root {
+            --bg-gradient-start: #e9f7ff;
+            --bg-gradient-end: #fffdf6;
+            --card-bg: #ffffff;
+            --accent: #ff9f4a;
+            --text-main: #3f3a3a;
+            --text-muted: #6e6458;
+            --border-soft: #e0f0ff;
+            --success: #38a169;
+            --danger: #e76f51;
+            --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.08);
+            --radius-card: 28px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, #e0f4ff 0, transparent 55%),
+                radial-gradient(circle at bottom right, #ffe5f0 0, transparent 55%),
+                linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .results-container {
+            background: var(--card-bg);
+            padding: 2.4rem 2.1rem 2.1rem;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-soft);
+            max-width: 520px;
+            width: 100%;
+            border: 1px solid var(--border-soft);
+            text-align: center;
+            position: relative;
+            margin: 1.8rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .results-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 18%;
+            right: 18%;
+            height: 6px;
+            border-radius: 0 0 999px 999px;
+            background: linear-gradient(90deg, #3fd1a0, #73e0b8);
+        }
+
+        .corner-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            z-index: 2;
+            pointer-events: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .corner-top-left    { top: 10px; left: 14px; }
+        .corner-top-right   { top: 10px; right: 14px; }
+        .corner-bottom-left { bottom: 10px; left: 14px; }
+        .corner-bottom-right{ bottom: 10px; right: 14px; }
+
+        h2 {
+            color: var(--accent);
+            margin-bottom: 0.8rem;
+            font-size: 1.9rem;
+            font-family: "Baloo 2", system-ui, sans-serif;
+        }
+
+        .emoji-badge {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0.4rem 0 1rem;
+            background: radial-gradient(circle at 30% 20%, #fff, #ffe9c4);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.1);
+        }
+
+        .score {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+        }
+
+        .message {
+            font-size: 1.15rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .details {
+            margin-top: 1rem;
+            background: #fff7f0;
+            padding: 1.2rem;
+            border-radius: 12px;
+            max-height: 380px;
+            overflow-y: auto;
+            display: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .details strong {
+            color: var(--danger);
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .mistake-item {
+            margin-bottom: 1rem;
+            padding: 0.9rem;
+            background: #fff;
+            border-left: 4px solid var(--danger);
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .mistake-item strong {
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .mistake-item p {
+            margin: 0.4rem 0;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        .mistake-item p.user-answer {
+            color: var(--danger);
+        }
+
+        .mistake-item p.correct-answer {
+            color: var(--success);
+        }
+
+        .lang-switcher {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .lang-switcher button {
+            background: #fff3e0;
+            border: 2px solid var(--accent);
+            padding: 0.35rem 0.7rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .lang-switcher button:hover {
+            background: #ffe0b2;
+        }
+
+        .lang-switcher button.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 159, 74, 0.4);
+        }
+
+        .restart-btn {
+            background: linear-gradient(90deg, #ff9f4a, #ffb347);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2.3rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 10px 22px rgba(255, 159, 74, 0.42);
+            transition: background 0.18s, transform 0.16s, box-shadow 0.18s;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 1.2rem;
+        }
+
+        .restart-btn:hover {
+            background: linear-gradient(90deg, #ff962e, #ffc068);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(255, 159, 74, 0.52);
+        }
+
+        .restart-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 6px 16px rgba(255, 159, 74, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .results-container {
+                padding: 2rem 1.1rem 1.8rem;
+                border-radius: 22px;
+                margin: 1.2rem 0.8rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .score {
+                font-size: 1.1rem;
+            }
+
+            .message {
+                font-size: 1rem;
+            }
+
+            .details {
+                max-height: 300px;
+            }
+
+            .restart-btn {
+                width: 100%;
+                max-width: 260px;
+            }
+
+            .lang-switcher {
+                top: 8px;
+                right: 8px;
+            }
+
+            .lang-switcher button {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="results-container" role="main" aria-labelledby="results-title">
+        <!-- Corner icons -->
+        <span class="corner-icon corner-top-left" title="Bone">🦴</span>
+        <span class="corner-icon corner-top-right" title="Sparkles">✨</span>
+        <span class="corner-icon corner-bottom-left" title="Brush">🖌️</span>
+        <span class="corner-icon corner-bottom-right" title="Pottery">🏺</span>
+
+        <div class="lang-switcher">
+            <button id="btn-en" onclick="setLang('en')">EN</button>
+            <button id="btn-bg" onclick="setLang('bg')">BG</button>
+        </div>
+
+        <h2 id="results-title">Quiz Results</h2>
+        <div class="emoji-badge" id="emoji-badge">🏆</div>
+        <div class="score" id="score"></div>
+        <div class="message" id="message"></div>
+        <div class="details" id="details"></div>
+
+        <button
+            class="restart-btn"
+            id="restart-btn"
+            type="button"
+            aria-label="Go back to the start page"
+        >
+            Go back to the start
+        </button>
+    </div>
+
+    <script>
+        // Translations
+        const translations = {
+            en: {
+                results: "Quiz Results",
+                wellDone: "Perfect! You are a true explorer! 🎉",
+                messages: [
+                    { min: 0, max: 20, text: "Don't worry! Keep learning and you'll improve. 💪" },
+                    { min: 20, max: 40, text: "Good effort! 📚" },
+                    { min: 40, max: 60, text: "Nice work! Keep going! 🌟" },
+                    { min: 60, max: 80, text: "Very good! 🚀" },
+                    { min: 80, max: 100, text: "Excellent! You really know your stuff! 👏" }
+                ],
+                restart: "Back to start",
+                mistakes: "Your Mistakes:",
+                yourAnswer: "Your answer:",
+                correctAnswer: "Correct answer:"
+            },
+            bg: {
+                results: "Резултати от викторината",
+                wellDone: "Перфектно! Вие сте истински изследовател! 🎉",
+                messages: [
+                    { min: 0, max: 20, text: "Не се притеснявайте! Опитайте отново 💪" },
+                    { min: 20, max: 40, text: "Добър опит! 📚" },
+                    { min: 40, max: 60, text: "Добрър опит! 🌟" },
+                    { min: 60, max: 80, text: "Много добре! 🚀" },
+                    { min: 80, max: 100, text: "Отлично! Наистина знаете материала! 👏" }
+                ],
+                restart: "Върни се в началото",
+                mistakes: "Вашите грешки:",
+                yourAnswer: "Вашият отговор:",
+                correctAnswer: "Правилен отговор:"
+            }
+        };
+
+        let lang = localStorage.getItem('language') || 'en';
+
+        function setLang(l) {
+            lang = l;
+            localStorage.setItem('language', l);
+            render();
+        }
+
+        function normalize(str) {
+            return str
+                .trim()
+                .toLowerCase()
+                .replace(/[^\w\s\u0400-\u04FF]/g, "");
+        }
+
+        const correctAnswers = JSON.parse(localStorage.getItem('correctAnswers') || '[]');
+        const userAnswers = JSON.parse(localStorage.getItem('userAnswers') || '[]');
+
+        let correctCount = 0;
+        const mistakes = [];
+
+        for (let i = 0; i < correctAnswers.length; i++) {
+            const user = userAnswers[i];
+            const correctList = correctAnswers[i];
+
+            if (!user || !correctList) continue;
+
+            const normalizedUser = normalize(user);
+
+            if (correctList.some(ans => normalize(ans) === normalizedUser)) {
+                correctCount++;
+            } else {
+                mistakes.push({ n: i + 1, user: user, correct: correctList });
+            }
+        }
+
+        function render() {
+            const t = translations[lang];
+            
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-bg').classList.toggle('active', lang === 'bg');
+            document.getElementById('results-title').textContent = t.results;
+            document.getElementById('restart-btn').textContent = t.restart;
+
+            document.getElementById('score').textContent = correctCount + " / " + correctAnswers.length;
+
+            let messageText;
+            if (correctCount === correctAnswers.length) {
+                messageText = t.wellDone;
+            } else {
+                const percentage = (correctCount / correctAnswers.length) * 100;
+                const msg = t.messages.find(m => percentage >= m.min && percentage < m.max);
+                messageText = msg ? msg.text : t.messages[0].text;
+            }
+            document.getElementById('message').textContent = messageText;
+
+            if (mistakes.length) {
+                const el = document.getElementById('details');
+                el.style.display = 'block';
+                el.innerHTML = '<strong>' + t.mistakes + '</strong>' + mistakes.map(m => {
+                    return '<div class="mistake-item"><strong>Question #' + m.n + '</strong><p class="user-answer"><strong>' + t.yourAnswer + '</strong> <em>' + (m.user || 'Not answered') + '</em></p><p class="correct-answer"><strong>' + t.correctAnswer + '</strong> <em>' + m.correct.join(', ') + '</em></p></div>';
+                }).join('');
+            } else {
+                document.getElementById('details').style.display = 'none';
+            }
+        }
+
+        const restartBtn = document.getElementById('restart-btn');
+        restartBtn.onclick = function() {
+            window.location.href = 'welcomeArchM.html';
+        };
+
+        render();
+    </script>
+</body>
+</html>
