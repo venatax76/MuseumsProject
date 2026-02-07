@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Animal Museum — Results</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        html,body{height:100%}
+        body{margin:0;display:flex;align-items:center;justify-content:center;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:linear-gradient(135deg,#e0f7fa 0%,#f1f8e9 100%)}
+        .results-container{background:#fff;padding:2rem;border-radius:20px;box-shadow:0 12px 30px rgba(0,0,0,.12);max-width:520px;width:100%;position:relative;text-align:center}
+        h2{color:#00796b;margin-top:0;margin-bottom:0.8rem}
+        .score{font-size:1.3rem;color:#004d40;margin:.6rem 0;font-weight:600}
+        .message{margin:1rem 0;color:#00695c;font-size:1.15rem;font-weight:600;line-height:1.5}
+        .btn{padding:.7rem 1.4rem;border-radius:12px;border:none;background:linear-gradient(90deg,#26a69a,#80cbc4);color:#fff;cursor:pointer;font-weight:600;transition:all 0.2s ease}
+        .btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px rgba(38,166,154,0.3)}
+        .details{margin-top:1rem;text-align:left;background:#e0f2f1;padding:1.2rem;border-radius:12px;max-height:380px;overflow-y:auto;display:none}
+        .details strong{color:#d32f2f;font-size:1rem;display:block;margin-bottom:1rem}
+        .mistake-item{margin-bottom:1rem;padding:0.9rem;background:#fff;border-left:4px solid #d32f2f;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+        .mistake-item strong{color:#004d40;display:block;margin-bottom:0.5rem;font-size:0.95rem}
+        .mistake-item p{margin:0.4rem 0;font-size:0.95rem;color:#004d40;line-height:1.4}
+        .mistake-item p.user{color:#d32f2f}
+        .mistake-item p.correct{color:#388e3c}
+        .lang-menu{position:absolute;top:1rem;right:1rem;display:flex;gap:.5rem;z-index:10}
+        .lang-btn{background:#e0f2f1;border:2px solid #80cbc4;padding:.3rem .7rem;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s ease}
+        .lang-btn:hover{background:#b2dfdb}
+        .lang-btn.active{background:#00796b;color:#fff;box-shadow:0 4px 12px rgba(0,121,107,0.4)}
+    </style>
+</head>
+<body>
+    <div class="results-container">
+        <div class="lang-menu">
+            <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" id="btn-bg" onclick="setLang('bg')">BG</button>
+        </div>
+
+        <h2 id="results-title">Results</h2>
+        <div class="score" id="score"></div>
+        <div class="message" id="message"></div>
+
+        <div class="details" id="details" style="display:none"></div>
+
+        <div style="margin-top:1rem">
+            <button class="btn" id="restart-btn">Back to start</button>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                results: "Quiz Results",
+                wellDone: "Perfect! You are a true naturalist! 🎉",
+                messages: [
+                    { min: 0, max: 20, text: "Don't worry! Keep learning and you'll improve. 💪" },
+                    { min: 20, max: 40, text: "Good effort! 📚" },
+                    { min: 40, max: 60, text: "Nice work! 🌟" },
+                    { min: 60, max: 80, text: "Very good! Almost there! 🚀" },
+                    { min: 80, max: 100, text: "Excellent! You really know your stuff! 👏" }
+                ],
+                back: "Back to start",
+                mistakes: "Your Mistakes:",
+                yourAnswer: "Your answer:",
+                correctAnswer: "Correct answer:"
+            },
+            bg: {
+                results: "Резултати от викторината",
+                wellDone: "Перфектно! Вие сте истински натуралист! 🎉",
+                messages: [
+                    { min: 0, max: 20, text: "Не се притеснявайте! Опитайте отново 💪" },
+                    { min: 20, max: 40, text: "Добър опит! 📚" },
+                    { min: 40, max: 60, text: "Добър опит! 🌟" },
+                    { min: 60, max: 80, text: "Много добре!🚀" },
+                    { min: 80, max: 100, text: "Отлично! Наистина знаете материала! 👏" }
+                ],
+                back: "Назад към началото",
+                mistakes: "Вашите грешки:",
+                yourAnswer: "Вашият отговор:",
+                correctAnswer: "Правилен отговор:"
+            }
+        };
+        let lang = localStorage.getItem('language') || 'en';
+        function setLang(l){ lang = l; localStorage.setItem('language', l); render(); }
+
+        document.getElementById('restart-btn').addEventListener('click', ()=>{
+            localStorage.removeItem('correctAnswersAM');
+            localStorage.removeItem('userAnswersAM');
+            window.location.href = 'WelcomeNaturalHistoryMuseum.html';
+        });
+
+        function normalize(s){ return (s||"").toString().trim().toLowerCase(); }
+
+        function render(){
+            document.getElementById('btn-en').classList.toggle('active', lang==='en');
+            document.getElementById('btn-bg').classList.toggle('active', lang==='bg');
+            document.getElementById('results-title').textContent = translations[lang].results;
+            document.getElementById('restart-btn').textContent = translations[lang].back;
+
+            const correctAnswers = JSON.parse(localStorage.getItem('correctAnswersAM') || '[]');
+            const userAnswers = JSON.parse(localStorage.getItem('userAnswersAM') || '[]');
+            let correctCount = 0;
+            const mistakes = [];
+
+            for(let i=0;i<correctAnswers.length;i++){
+                const accepted = correctAnswers[i] || [];
+                const user = userAnswers[i] || "";
+                const matched = accepted.some(a => normalize(a) === normalize(user));
+                if(matched) {
+                    correctCount++;
+                } else {
+                    mistakes.push({num:i+1, user, correct:accepted});
+                }
+            }
+
+            document.getElementById('score').textContent = correctCount + " / " + correctAnswers.length;
+            
+            let messageText;
+            if(correctCount === correctAnswers.length) {
+                messageText = translations[lang].wellDone;
+            } else {
+                const percentage = (correctCount / correctAnswers.length) * 100;
+                const msg = translations[lang].messages.find(m => percentage >= m.min && percentage < m.max);
+                messageText = msg ? msg.text : translations[lang].messages[0].text;
+            }
+            document.getElementById('message').textContent = messageText;
+
+            if(mistakes.length){
+                const el = document.getElementById('details');
+                el.style.display = 'block';
+                el.innerHTML = '<strong>' + translations[lang].mistakes + '</strong>' + mistakes.map(m=>{
+                    return '<div class="mistake-item"><strong>Question #' + m.num + '</strong><p class="user"><strong>' + translations[lang].yourAnswer + '</strong> <em>' + (m.user||'Not answered') + '</em></p><p class="correct"><strong>' + translations[lang].correctAnswer + '</strong> <em>' + m.correct.join(', ') + '</em></p></div>';
+                }).join('');
+            } else {
+                document.getElementById('details').style.display = 'none';
+            }
+        }
+
+        // initial render
+        render();
+    </script>
+</body>
+</html>

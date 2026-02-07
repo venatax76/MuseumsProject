@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Animal Museum — Questions</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        html,body{height:100%}
+        body{margin:0;display:flex;align-items:center;justify-content:center;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:linear-gradient(135deg,#e0f7fa 0%,#f1f8e9 100%)}
+        body{margin:0;display:flex;align-items:center;justify-content:center;font-family:'Comic Sans MS','Comic Sans',cursive,'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#e0f7fa 0%,#f1f8e9 100%)}
+        .questions-container{background:#fff;padding:2rem;border-radius:20px;box-shadow:0 12px 30px rgba(0,0,0,.12);max-width:520px;width:100%;position:relative}
+        .lang-menu{position:absolute;top:1rem;right:1rem;display:flex;gap:.4rem;align-items:center}
+        .lang-btn{background:#e0f2f1;border:2px solid #80cbc4;padding:.35rem .7rem;border-radius:8px;cursor:pointer}
+        .lang-btn.active{background:#b2dfdb;color:#004d40;border-color:#26a69a}
+        h2{color:#00796b;margin:0 0 1rem 0;text-align:center}
+        .question{background:#e0f7fa;padding:1rem;border-radius:10px;margin-bottom:1rem;text-align:center}
+        input[type=text]{width:90%;padding:.6rem;border-radius:8px;border:2px solid #b2dfdb}
+        .controls{display:flex;gap:.6rem;justify-content:center}
+        .btn{padding:.7rem 1.4rem;border-radius:12px;border:none;background:linear-gradient(90deg,#26a69a,#80cbc4);color:#fff;cursor:pointer;font-weight:600}
+        .btn[disabled]{opacity:.5;cursor:not-allowed}
+        .progress-wrap{height:14px;background:#e0f2f1;border-radius:9px;overflow:hidden;margin-bottom:1rem}
+        .progress{height:100%;background:linear-gradient(90deg,#26a69a,#80cbc4);width:0%;transition:width .35s}
+        .option-row{display:flex;align-items:center;gap:.6rem;justify-content:center;margin:.35rem 0}
+    </style>
+</head>
+<body>
+    <div class="questions-container">
+        <div class="lang-menu">
+            <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" id="btn-bg" onclick="setLang('bg')">BG</button>
+        </div>
+
+        <h2 id="quiz-title">Quiz Time!</h2>
+
+        <div class="progress-wrap"><div class="progress" id="progress-bar"></div></div>
+
+        <form id="quiz-form">
+            <div id="question-area"></div>
+
+            <div class="controls">
+                <button type="button" class="btn" id="next-btn" disabled>Next</button>
+                <button type="submit" class="btn" id="submit-btn" style="display:none">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const translations = {
+            en: { quizTime: "Quiz Time!", next: "Next", submit: "Submit", options: "Choose one option:" },
+            bg: { quizTime: "Време за викторина!", next: "Напред", submit: "Готово", options: "Изберете един отговор:" }
+        };
+
+        let lang = localStorage.getItem('language') || 'en';
+        function setLang(l){ lang = l; localStorage.setItem('language', l); updateLangUI(); showQuestion(currentQuestion); }
+        function updateLangUI(){
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-bg').classList.toggle('active', lang === 'bg');
+            document.getElementById('quiz-title').textContent = translations[lang].quizTime;
+            document.getElementById('next-btn').textContent = translations[lang].next;
+            document.getElementById('submit-btn').textContent = translations[lang].submit;
+        }
+
+        // questions for Animal Museum
+const questionList = [
+    {
+        text: {
+            en: "How many years ago was planet Earth formed?",
+            bg: "Преди около колко години се формира планетата Земя?"
+        },
+        type: "choice",
+        options: {
+            en: ["4.5-4.6 billion years", "2000 years", "65 million years", "2000 billion years"],
+            bg: ["4,5 – 4,6 млрд. г.", "2000 г.", "65 млн. г.", "2000 млрд. г."]
+        },
+        answers: ["4.5-4.6 billion years", "4,5 – 4,6 млрд. г."]
+    },
+
+    {
+        text: {
+            en: "In which geological period did life originate on Earth?",
+            bg: "През кой геологичен период възниква животът на Земята?"
+        },
+        type: "choice",
+        options: {
+            en: ["Jurassic", "Neozoic", "Precambrian", "Devonian"],
+            bg: ["Юра", "Неозой", "Докамбрий", "Девон"]
+        },
+        answers: ["Precambrian", "Докамбрий"]
+    },
+
+    {
+        text: {
+            en: "What happened approximately 65.5 million years ago?",
+            bg: "Какво се случва преди около 65,5 млн. г.?"
+        },
+        type: "choice",
+        options: {
+            en: ["Mass extinction", "Nothing significant", "First primates appeared", "Earth was formed"],
+            bg: ["масово измиране", "нищо съществено", "появяват се първите примати", "формира се планетата Земя"]
+        },
+        answers: ["Mass extinction", "масово измиране"]
+    },
+
+    {
+        text: {
+            en: "Deinotherium is a:",
+            bg: "Дейнотериумът е?"
+        },
+        type: "choice",
+        options: {
+            en: ["Relative of elephants", "Giant elk", "Giant carnivorous wild boar", "Small prehistoric rodent"],
+            bg: ["роднина на слоновете", "гигантски елен", "вид гигантско хищно диво прасе", "дребен праисторически гризач"]
+        },
+        answers: ["Relative of elephants", "роднина на слоновете"]
+    },
+
+    {
+        text: {
+            en: "Mastodon is a:",
+            bg: "Мастодонтът е?"
+        },
+        type: "choice",
+        options: {
+            en: ["Giant wolf species", "Elk species", "Elephant species", "Marine scorpion species"],
+            bg: ["вид огромен вълк", "вид елен", "вид слон", "вид морски скорпион"]
+        },
+        answers: ["Elephant species", "вид слон"]
+    },
+
+    {
+        text: {
+            en: "True or false: Strandja greenery is found only in Bulgaria?",
+            bg: "Вярно ли е, че Стрянджанската зеленика се среща само в България?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, only in Strandja", "No, also found in the Caucasus"],
+            bg: ["Да, среща се само в Странджа", "Не, растението има находища и в Кавказ"]
+        },
+        answers: ["No, also found in the Caucasus", "Не, растението има находища и в Кавказ"]
+    },
+
+    {
+        text: {
+            en: "What percentage of trees in Strandja are over 100 years old?",
+            bg: "Колко процента от дърветата в Странджа са на възраст над 100 г.?"
+        },
+        type: "choice",
+        options: {
+            en: ["90%", "30%", "2%"],
+            bg: ["90%", "30%", "2%"]
+        },
+        answers: ["30%", "30%"]
+    },
+
+    {
+        text: {
+            en: "The origin of dunes along the Black Sea coast is:",
+            bg: "Произходът на дюните по Черноморското крайбрежие е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Erosion of rocks and soil", "Fragmented shell organisms", "Modified black earth soil", "Unclear"],
+            bg: ["от ерозия на скали и почва", "от раздробени черупчести организми", "от видоизменена черноземна почва", "неясен"]
+        },
+        answers: ["Erosion of rocks and soil", "от ерозия на скали и почва"]
+    },
+
+    {
+        text: {
+            en: "What percentage of Strandja territory is covered by forests?",
+            bg: "Колко процента от територията на Странджа е заета от гори?"
+        },
+        type: "choice",
+        options: {
+            en: ["100%", "20%", "80%"],
+            bg: ["100%", "20%", "80%"]
+        },
+        answers: ["80%", "80%"]
+    },
+
+    {
+        text: {
+            en: "True or false: Ferns are ancient and primitive plants?",
+            bg: "Вярно ли е, че папратите са древни и примитивни растения?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, appeared in Paleozoic, ~400 million years ago", "No, arose during last ice age, ~10,000 years ago"],
+            bg: ["Да, появяват се още в Палеозоя, преди около 400 млн. г.", "Не, възникват по време на последният ледников период, преди около 10 000 г."]
+        },
+        answers: ["Yes, appeared in Paleozoic, ~400 million years ago", "Да, появяват се още в Палеозоя, преди около 400 млн. г."]
+    },
+
+    {
+        text: {
+            en: "What is an herb?",
+            bg: "Какво наричаме билка?"
+        },
+        type: "choice",
+        options: {
+            en: ["Plant leaves with medicinal properties", "Plant fruit with medicinal properties", "Plant stem with medicinal properties", "Any part or whole medicinal plant"],
+            bg: ["листа на растение с лечебни свойства", "плод на растение с лечебни свойства", "стебло на растение с лечебни свойства", "както различни части от растението, така и цялото растение"]
+        },
+        answers: ["Any part or whole medicinal plant", "както различни части от растението, така и цялото растение"]
+    },
+
+    {
+        text: {
+            en: "What is the symbol of Strandja?",
+            bg: "Кой е символът на Странджа?"
+        },
+        type: "choice",
+        options: {
+            en: ["Hairy oak", "Strandja greenery", "Dune of Arkutino", "River Veleka"],
+            bg: ["Косматият дъб", "Странджанската Зеленика", "Дюната на Аркутино", "р. Велека"]
+        },
+        answers: ["Strandja greenery", "Странджанската Зеленика"]
+    },
+
+    {
+        text: {
+            en: "How many endemic plant species are found in Strandja?",
+            bg: "Колко ендемични вида растения се срещат в Странджа?"
+        },
+        type: "choice",
+        options: {
+            en: ["7", "1275", "56"],
+            bg: ["7", "1275", "56"]
+        },
+        answers: ["56", "56"]
+    },
+
+    {
+        text: {
+            en: "What is Blagun?",
+            bg: "Благун е?"
+        },
+        type: "choice",
+        options: {
+            en: ["Known scientist studying Strandja relief", "Type of tree", "Swamp bird", "Type of beetle"],
+            bg: ["известен учен, изследвал релефа на Странджа", "вид дърво", "блатна птица", "вид бръмбар сечко"]
+        },
+        answers: ["Type of tree", "вид дърво"]
+    },
+
+    {
+        text: {
+            en: "Skull moth is:",
+            bg: "Мъртвежка глава е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Type of fly", "Type of beetle", "Type of butterfly", "Type of poisonous marsh plant"],
+            bg: ["вид муха", "вид бръмбар", "вид пеперуда", "вид отровно блатно растение"]
+        },
+        answers: ["Type of butterfly", "вид пеперуда"]
+    },
+
+    {
+        text: {
+            en: "Scorpions are:",
+            bg: "Скорпионите са?"
+        },
+        type: "choice",
+        options: {
+            en: ["Insects", "Arachnids", "Crustaceans", "Woodlice"],
+            bg: ["насекоми", "паякообразни", "ракообразни", "мокрици"]
+        },
+        answers: ["Arachnids", "паякообразни"]
+    },
+
+    {
+        text: {
+            en: "Arthropods are called:",
+            bg: "Членестоногите се наричат:"
+        },
+        type: "choice",
+        options: {
+            en: ["Insects", "Arachnids", "All listed"],
+            bg: ["насекомите", "паякообразните", "всички изброени"]
+        },
+        answers: ["All listed", "всички изброени"]
+    },
+
+    {
+        text: {
+            en: "True or false: Are there sharks in the Black Sea?",
+            bg: "Вярно ли е, че в Черно море се срещат акули?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, only one species - Spiny Black Sea shark", "No, sharks only in large seas and oceans"],
+            bg: ["Да, в Черно море се среща само един вид – Бодливата Черноморска акула", "Не, акулите се срещат само в големите морета и океани"]
+        },
+        answers: ["Yes, only one species - Spiny Black Sea shark", "Да, в Черно море се среща само един вид – Бодливата Черноморска акула"]
+    },
+
+    {
+        text: {
+            en: "Sea dragon is:",
+            bg: "Морски дракон е"
+        },
+        type: "choice",
+        options: {
+            en: ["Giant aquatic snake from dinosaur era", "Mythical creature in Strandja folklore", "Type of fish"],
+            bg: ["вид голяма водна змия, обитавала нашите води по времето на динозаврите", "митологично същество, типично за Странджанския фолклор", "вид риба"]
+        },
+        answers: ["Type of fish", "вид риба"]
+    },
+
+    {
+        text: {
+            en: "Which three species are invasive to the Black Sea?",
+            bg: "Кои три от изброените видове са инвазивни за Черно море?"
+        },
+        type: "choice",
+        options: {
+            en: ["Rapan, Blue crab, Black mussel", "Rapan, Seahorse, White sand mussel", "Blue crab, Black mussel, Scorpion"],
+            bg: ["Рапан, Син рак, Черната мида", "Рапан, Морското конче, Бяла пясъчна мида", "Син рак, Черната мида, Скорпид"]
+        },
+        answers: ["Rapan, Blue crab, Black mussel", "Рапан, Син рак, Черната мида"]
+    },
+
+    {
+        text: {
+            en: "Which class does the water tortoise belong to?",
+            bg: "Към кой клас спада водната костенурка?"
+        },
+        type: "choice",
+        options: {
+            en: ["Amphibians", "Reptiles", "Chimeras"],
+            bg: ["земноводни", "влечуги", "химери"]
+        },
+        answers: ["Reptiles", "влечуги"]
+    },
+
+    {
+        text: {
+            en: "Which class does the Newt belong to?",
+            bg: "Към кой клас спада Дъждовникът"
+        },
+        type: "choice",
+        options: {
+            en: ["Amphibians", "Reptiles", "Aquatic lizards"],
+            bg: ["земноводни", "влечуги", "водни гущери"]
+        },
+        answers: ["Amphibians", "земноводни"]
+    },
+
+    {
+        text: {
+            en: "True statements about the Common water snake (Natrix natrix):",
+            bg: "Кои от изброените са вярни твърдения за Обикновената водна змия"
+        },
+        type: "choice",
+        options: {
+            en: ["Harmless snake", "Feeds mainly with fish and frogs", "Sprays foul-smelling secretion from cloaca", "Despite being snake, has limbs"],
+            bg: ["безобиден смок", "храни се основно с риба и жаби", "пръска зловонен секрет от клоаката си", "въпреки, че е змия, тя всъщност има крайници"]
+        },
+        answers: ["Harmless snake, Feeds mainly with fish and frogs, Sprays foul-smelling secretion from cloaca", "безобиден смок, храни се основно с риба и жаби, пръска зловонен секрет от клоаката си"]
+    },
+
+    {
+        text: {
+            en: "True statement about amphibians:",
+            bg: "Кое твърдение за земноводните е вярно?"
+        },
+        type: "choice",
+        options: {
+            en: ["Divided into tailed and tailless", "No such division exists"],
+            bg: ["Земноводните се делят на опашати и безопашати", "Няма такова нещо като опашати и безопашати земноводни"]
+        },
+        answers: ["Divided into tailed and tailless", "Земноводните се делят на опашати и безопашати"]
+    },
+
+    {
+        text: {
+            en: "Green lizard and Newt are:",
+            bg: "Зеленият гущер и Дъждовникът са:"
+        },
+        type: "choice",
+        options: {
+            en: ["Close relatives", "Representatives of different vertebrate classes", "Same woodland species", "Mystical beings"],
+            bg: ["близки родственици", "представители на два различни класа гръбначни животни", "наименования на един и същ горски вид гущер", "мистични същества от Странджанската митология"]
+        },
+        answers: ["Representatives of different vertebrate classes", "представители на два различни класа гръбначни животни"]
+    },
+
+    {
+        text: {
+            en: "Where can the Garlic toad be found?",
+            bg: "Къде може да се срещне жабата Чесновница?"
+        },
+        type: "choice",
+        options: {
+            en: ["In garlic fields", "In deep ditches", "In sandy habitats", "In forest habitats, on tree crowns"],
+            bg: ["в ниви с чесън", "в дълбоки вирове", "в пясъчни местообитания", "в горски местообитания, най-вече по короните на дърветата"]
+        },
+        answers: ["In sandy habitats", "в пясъчни местообитания"]
+    },
+
+    {
+        text: {
+            en: "Are there otters in Bulgaria?",
+            bg: "Има ли видри в България?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, throughout the country", "No, hunted to extinction in late 19th century"],
+            bg: ["Има, видрата се среща в цялата страна", "Няма, в България някога е имало видри, но са били ловувани до изчезване в края на 19ти век"]
+        },
+        answers: ["Yes, throughout the country", "Има, видрата се среща в цялата страна"]
+    },
+
+    {
+        text: {
+            en: "How many dolphin species are found in the Black Sea?",
+            bg: "Колко вида делфини се срещат в Черно море?"
+        },
+        type: "choice",
+        options: {
+            en: ["2", "3", "4"],
+            bg: ["2", "3", "4"]
+        },
+        answers: ["3", "3"]
+    },
+
+    {
+        text: {
+            en: "Porpoise is:",
+            bg: "Морската свиня е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Large bottom fish", "Type of dolphin", "Aquatic bird"],
+            bg: ["вид едра дънна риба", "вид делфин", "вид водоплаваща птица"]
+        },
+        answers: ["Type of dolphin", "вид делфин"]
+    },
+
+    {
+        text: {
+            en: "Afala and Mutkur are:",
+            bg: "Афала и Муткур са:"
+        },
+        type: "choice",
+        options: {
+            en: ["Bird species", "Fish species", "Dolphin species", "Extinct large mammals"],
+            bg: ["видове птици", "видове риби", "видове делфини", "видове изчезнали едри бозайници"]
+        },
+        answers: ["Dolphin species", "видове делфини"]
+    },
+
+    {
+        text: {
+            en: "Spoonbill is:",
+            bg: "Лопатарката е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Bird with flat bill tip for catching prey", "Shrimp with shovel-like claws", "Bottom fish with shovel-like fins"],
+            bg: ["вид птица с плосък върх на клюна", "вид скарида с плоски щипки", "вид дънна риба с предни плавници като лопатки"]
+        },
+        answers: ["Bird with flat bill tip for catching prey", "вид птица с плосък върх на клюна"]
+    },
+
+    {
+        text: {
+            en: "Which birds have long sharp bills used like harpoons?",
+            bg: "Кои от птиците имат дълъг и остър клюн?"
+        },
+        type: "choice",
+        options: {
+            en: ["Heron", "Swallow", "Kestrel", "Stork"],
+            bg: ["Чапла", "Лястовица", "Мишкар", "Щъркел"]
+        },
+        answers: ["Heron", "Stork", "Чапла", "Щъркел"]
+    },
+
+    {
+        text: {
+            en: "The migration path through our Black Sea is called:",
+            bg: "Прелетният път на птиците, който минава по нашето Черноморие се нарича:"
+        },
+        type: "choice",
+        options: {
+            en: ["Via Aristotilis", "Via Chernomorsis", "Via Pontica", "Via Aurelius"],
+            bg: ["Виа Аристотилис", "Виа Черноморсис", "Виа Понтика", "Виа Аурелиус"]
+        },
+        answers: ["Via Pontica", "Виа Понтика"]
+    },
+
+    {
+        text: {
+            en: "Which bird species do NOT exist?",
+            bg: "Кои от изброените видове птици не съществуват:"
+        },
+        type: "choice",
+        options: {
+            en: ["Saber-billed, Gray slender bat, Cuckoo runner", "Buffy-backed hummingbird, Nile woodpecker, Spiny-billed swimmer"],
+            bg: ["Саблеклюн, Сива тънкопереста вечерница, Кокилобегач", "Буревестник, Нилска Дълбококопачница, Шипоклюн плувец"]
+        },
+        answers: ["Buffy-backed hummingbird, Saber-billed, Cuckoo runner", "Буревестник, Кокилобегач, Саблеклюн"]
+    },
+
+    {
+        text: {
+            en: "True statements about Black Stork:",
+            bg: "Кои твърдения са верни за Черният щъркел?"
+        },
+        type: "choice",
+        options: {
+            en: ["Rare species, nests far from humans", "Mythological creature, connected with legends and superstitions","Black color is mutation of regular stork"],
+            bg: ["рядък вид, гнезди далече от човешките селища", "митологично същество, свързано с приказки и суеверия","черният щъркел е разновидност на познатият ни щъркел, където перата почерняват заради мутация"]
+        },
+        answers: ["Mythological creature, connected with legends and superstitions", "митологично същество, свързано с приказки и суеверия"]
+    },
+
+    {
+        text: {
+            en: "Gugutka and Gurgulitsa are:",
+            bg: "Гугутката и гургулицата са:"
+        },
+        type: "choice",
+        options: {
+            en: ["Synonyms for same bird", "Two closely related species", "Names for male and female urban bird"],
+            bg: ["синоними за един и същи вид птица", "два близкородствени вида птици", "наименования на мъжки и женски индивид вид градска птица"]
+        },
+        answers: ["Two closely related species", "два близкородствени вида птици"]
+    },
+
+    {
+        text: {
+            en: "Difference between gull and glaucous gull:",
+            bg: "Каква е разликата между чайката и гларусът?"
+        },
+        type: "choice",
+        options: {
+            en: ["Gull is newborn glaucous gull", "Gull is small local bird, glaucous is invasive Atlantic species", "Glaucous gull is type of gull"],
+            bg: ["чайка се нарича новоизлюпеното на гларусът", "чайката е малка морска птица типична за нашите ширини, а гларусът е инвазивен атлантически вид", "гларусът е вид чайка"]
+        },
+        answers: ["Glaucous gull is type of gull", "гларусът е вид чайка"]
+    },
+
+    {
+        text: {
+            en: "Do birds only nest on roofs and trees?",
+            bg: "Птиците само на покриви и дървета ли строят гнезадата си?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, no ground nests due to predators", "No, some nest on ground like Saber-bill with camouflage eggs"],
+            bg: ["Да, птиците не правят гнезда на земята", "Не, някои птици гнездят и на земята, като например Саблеклюна"]
+        },
+        answers: ["No, some nest on ground like Saber-bill with camouflage eggs", "Не, някои птици гнездят и на земята, като например Саблеклюна"]
+    },
+
+    {
+        text: {
+            en: "Which bird has distinctive crest on head?",
+            bg: "Коя птица може да характеризираме с изразен гребен на главата?"
+        },
+        type: "choice",
+        options: {
+            en: ["Jay", "Crested ibis", "River kingfisher", "Hoopoe"],
+            bg: ["сойката", "гривяка", "речната рибарка", "папуняка"]
+        },
+        answers: ["Hoopoe", "папуняка"]
+    },
+
+    {
+        text: {
+            en: "Rarest migrating bird visiting Burgas lakes:",
+            bg: "Кой е най-редкият вид прелетна птица, която посещава и Бургаските езера?"
+        },
+        type: "choice",
+        options: {
+            en: ["Reed warbler", "Hoopoe", "Crested cormorant", "Thin-billed mute swan"],
+            bg: ["Тръстиковото шаварче", "Папуняка", "Качулатият корморан", "Тънкоклюн свирец"]
+        },
+        answers: ["Thin-billed mute swan", "Тънкоклюн свирец"]
+    },
+
+    {
+        text: {
+            en: "Red color of Atanasov Lake is due to:",
+            bg: "Червеният цвят на Атанасовското езеро се дължи на?"
+        },
+        type: "choice",
+        options: {
+            en: ["Pollution", "Blood from high predation in summer", "Excess red algae population"],
+            bg: ["замърсяване", "кръв заради високото хищничество", "свръх популация на червени водорасли"]
+        },
+        answers: ["Excess red algae population", "свръх популация на червени водорасли"]
+    },
+
+    {
+        text: {
+            en: "Which are lakes near Burgas?",
+            bg: "Кои от изброените са езера, срещащи се край Бургас?"
+        },
+        type: "choice",
+        options: {
+            en: ["Mandrenska, Burgas Lake, Atanasovsko", "Burgas Lake, Konlusko, Atanasovsko Lake"],
+            bg: ["Мандренското езеро, Бургаското езеро, Атанасовското езеро", "Бургаското езеро, Конлушкото езеро, Атанасовското езеро"]
+        },
+        answers: ["Mandrenska, Burgas Lake, Atanasovsko", "Мандренското езеро, Бургаското езеро, Атанасовското езеро"]
+    },
+
+    {
+        text: {
+            en: "Characteristics of Swift:",
+            bg: "Кои от изброените са характерни за птицата Бързолет?"
+        },
+        type: "choice",
+        options: {
+            en: ["Short and wide wings, short legs", "Long and sharp wings, short legs", "Short wings, long legs"],
+            bg: ["къси и широки криле, къси крака", "издължени и остри криле, къси крака", "къси криле, дълги крака"]
+        },
+        answers: ["Long and sharp wings, short legs", "издължени и остри криле, къси крака"]
+    },
+
+    {
+        text: {
+            en: "Which birds are ravens?",
+            bg: "Кои от изброените птици са вранови?"
+        },
+        type: "choice",
+        options: {
+            en: ["Jay, magpie, crow, rook, daw", "Magpie, crow, thrush", "Jay, magpie, crow, rook"],
+            bg: ["сойка, сврачка, чавка, сврака, чинка", "сврачка, чавка, кос", "сойка, сврачка, чавка, сврака"]
+        },
+        answers: ["Jay, crow, rook", "сойка, чавка, сврака"]
+    },
+
+    {
+        text: {
+            en: "Crested ibis is:",
+            bg: "Гривякът е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Marine fish", "River fish", "Pigeon type", "Small rodent"],
+            bg: ["вид морска риба", "вид речна риба", "вид гълъб", "вид дребен гризач"]
+        },
+        answers: ["Pigeon type", "вид гълъб"]
+    },
+
+    {
+        text: {
+            en: "Bee-eater bird color is entirely:",
+            bg: "Авлигата е птица, чиито цвят на тялото е изцяло..."
+        },
+        type: "choice",
+        options: {
+            en: ["Blue", "Yellow", "Red", "Green"],
+            bg: ["син", "жълт", "червен", "зелен"]
+        },
+        answers: ["Yellow", "жълт"]
+    },
+
+    {
+        text: {
+            en: "Nutria is:",
+            bg: "Нутрията е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Freshwater fish", "Night butterfly", "Bird", "Mammal"],
+            bg: ["вид сладководна риба", "вид нощна пеперуда", "вид птица", "вид бозайник"]
+        },
+        answers: ["Mammal", "вид бозайник"]
+    },
+
+    {
+        text: {
+            en: "Bats are:",
+            bg: "Прилепите са:"
+        },
+        type: "choice",
+        options: {
+            en: ["Separate order of flying mammals", "Flying mice", "Relatives of hedgehogs", "Next stage in bird evolution"],
+            bg: ["отделен разред летящи бозайници", "летящи мишки", "родственици на поровете", "следващия стадий в еволюцията на птиците"]
+        },
+        answers: ["Separate order of flying mammals", "отделен разред летящи бозайници"]
+    },
+
+    {
+        text: {
+            en: "Hedgehog spines are:",
+            bg: "Бодлите на таралежите са?"
+        },
+        type: "choice",
+        options: {
+            en: ["Modified hairs", "Modified horn particles", "Bone growths"],
+            bg: ["видоизменени косми", "видоизменени рогови частици", "костни израстъци"]
+        },
+        answers: ["Modified hairs", "видоизменени косми"]
+    },
+
+    {
+        text: {
+            en: "How many mammal species are found in Bulgaria?",
+            bg: "Колко вида бозайници се срещат в България?"
+        },
+        type: "choice",
+        options: {
+            en: ["Around 20", "Over 1000", "Over 100"],
+            bg: ["около 20", "над 1000", "над 100"]
+        },
+        answers: ["Over 100", "над 100"]
+    },
+
+    {
+        text: {
+            en: "True statement about Bulgaria's mammal diversity:",
+            bg: "Кое твърдение е вярно?"
+        },
+        type: "choice",
+        options: {
+            en: ["Bulgaria is last in Europe for mammal diversity", "Bulgaria leads Europe in mammal diversity"],
+            bg: ["България е на едно от последните места в Европа по разнообразие", "България е водеща в Европа по разнообразие"]
+        },
+        answers: ["Bulgaria leads Europe in mammal diversity", "България е водеща в Европа по разнообразие"]
+    },
+
+    {
+        text: {
+            en: "Which mammals are dog-like?",
+            bg: "Кои видове бозайници са кучеподобни?"
+        },
+        type: "choice",
+        options: {
+            en: ["Wolf, badger, fox", "Jackal, fox, wolf", "Wolf, jackal, badger"],
+            bg: ["вълк, язовец, лисица", "чакал, лисица, вълк", "вълк, чакал, язовец"]
+        },
+        answers: ["Jackal, fox, wolf", "чакал, лисица, вълк"]
+    },
+
+    {
+        text: {
+            en: "Smallest mammal in the world found in Bulgaria:",
+            bg: "Кой е най-дребният бозайник в Света, който се среща и в България?"
+        },
+        type: "choice",
+        options: {
+            en: ["Brown bat", "Etruscan shrew", "Sleepy dormouse"],
+            bg: ["Кафявото прилепче", "Етруската земеровка", "Мишевидният сънливец"]
+        },
+        answers: ["Etruscan shrew", "Етруската земеровка"]
+    },
+
+    {
+        text: {
+            en: "Hedgehog is:",
+            bg: "Таралежът е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Rodent", "Insectivorous mammal", "Porcupine"],
+            bg: ["вид гризач", "вид насекомояден бозайник", "вид пор"]
+        },
+        answers: ["Insectivorous mammal", "вид насекомояден бозайник"]
+    },
+
+    {
+        text: {
+            en: "Badger is:",
+            bg: "Язовецът е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Insectivorous mammal", "Dog-like mammal", "Porcupine"],
+            bg: ["вид насекомояден бозайник", "вид кучеподобно", "вид пор"]
+        },
+        answers: ["Porcupine", "вид пор"]
+    },
+
+    {
+        text: {
+            en: "Which mammal families are found in Bulgaria?",
+            bg: "Кои семейства чифтокопитни бозайници се срещат в България?"
+        },
+        type: "choice",
+        options: {
+            en: ["Deer, antelopes, dog-like", "Pigs, porcupines, cats", "Antelopes, pigs, deer"],
+            bg: ["лалугери, кухороги, кучеподобни", "свине, порове, котки", "кухороги, свине, елени"]
+        },
+        answers: ["Antelopes, pigs, deer", "кухороги, свине, елени"]
+    },
+
+    {
+        text: {
+            en: "Wild boars feed on:",
+            bg: "С какво се хранят дивите свине?"
+        },
+        type: "choice",
+        options: {
+            en: ["Potatoes", "Meat", "Omnivorous"],
+            bg: ["с грудки", "с месо", "всеядни"]
+        },
+        answers: ["Omnivorous", "всеядни"]
+    },
+
+    {
+        text: {
+            en: "True or false: Underground rabbit is most widespread mammal in Bulgaria?",
+            bg: "Вярно ли е твърдението, че Заекът подземник е най-разпространеният бозайник в България?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, found everywhere", "No, only on St. Ivan island"],
+            bg: ["Да, среща се повсеместно", "Не, среща се само на о. Св. Иван"]
+        },
+        answers: ["No, only on St. Ivan island", "Не, среща се само на о. Св. Иван"]
+    },
+
+    {
+        text: {
+            en: "True statement about badgers:",
+            bg: "Кое е вярно за язовците?"
+        },
+        type: "choice",
+        options: {
+            en: ["Weak hearing, good vision, good smell", "Weak vision, good hearing, good smell", "Weak smell, good vision, weak hearing"],
+            bg: ["имат слаб слух, добро зрение, добре развито обоняние", "имат слабо зрение, добър слух, добре развито обоняние", "имат слабо обоняние, добро зрение, слаб слух"]
+        },
+        answers: ["Weak vision, good hearing, good smell", "имат слабо зрение, добър слух, добре развито обоняние"]
+    },
+
+    {
+        text: {
+            en: "Which mammals are found in Strandja?",
+            bg: "Кои от изброените бозайници се срещат в Странджа?"
+        },
+        type: "choice",
+        options: {
+            en: ["Jackal, bear, wolf, otter", "Wolf, otter, skunk", "Jackal, bear, wolf, otter, skunk"],
+            bg: ["чакал, мечка, вълк, видра", "вълк, видра, скункс", "чакал, мечка, вълк, видра, скункс"]
+        },
+        answers: ["Jackal, wolf, otter", "чакал, вълк, видра"]
+    },
+
+    {
+        text: {
+            en: "Which mammal lives solitary?",
+            bg: "Кой от изброените видове бозайници води самостоятелен начин на живот?"
+        },
+        type: "choice",
+        options: {
+            en: ["Badger", "Wild cat", "Jackal"],
+            bg: ["язовец", "дива котка", "чакал"]
+        },
+        answers: ["Wild cat", "дива котка"]
+    },
+
+    {
+        text: {
+            en: "True or false: Rabbits are rodents?",
+            bg: "Вярно ли е твърдението, че Зайците са гризачи?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, rabbits are rodents", "No, rabbits are separate mammal order"],
+            bg: ["Да, зайците са вид гризач", "Не, зайците са отделен разред бозайници"]
+        },
+        answers: ["No, rabbits are separate mammal order", "Не, зайците са отделен разред бозайници"]
+    },
+
+    {
+        text: {
+            en: "Sand is formed from:",
+            bg: "Пясъците се образуват от:"
+        },
+        type: "choice",
+        options: {
+            en: ["Rock erosion", "Shell organism remains", "Both"],
+            bg: ["ерозия на скали", "останки от черупчести животни", "и двете"]
+        },
+        answers: ["Both", "и двете"]
+    },
+
+    {
+        text: {
+            en: "Dolphins are:",
+            bg: "Делфините са"
+        },
+        type: "choice",
+        options: {
+            en: ["Mammals adapted to aquatic life", "Descendants of prehistoric ichthyosaurs", "Fish that developed mammal traits"],
+            bg: ["бозайници, адаптирани към воден начин на живот", "наследници на праисторическите ихтиозаври", "риби, които в хода на еволюцията си са придобили черти на бозайници"]
+        },
+        answers: ["Mammals adapted to aquatic life", "бозайници, адаптирани към воден начин на живот"]
+    },
+
+    {
+        text: {
+            en: "Marine turtle is typical Black Sea species:",
+            bg: "Морската костенурка е типичен Черноморски вид"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, inhabits southern Black Sea and sometimes visits our waters", "No, enters through Bosporus from Mediterranean accidentally"],
+            bg: ["Вярно, обитава най-южните части на Черно море и посещава наши води", "Грешно, навлизат през Босфора от Егейско море случайно"]
+        },
+        answers: ["No, enters through Bosporus from Mediterranean accidentally", "Грешно, навлизат през Босфора от Егейско море случайно"]
+    },
+
+    {
+        text: {
+            en: "Rapan is:",
+            bg: "Рапанът е:"
+        },
+        type: "choice",
+        options: {
+            en: ["Carnivorous mussel", "Marine snail", "Crustacean"],
+            bg: ["вид хищна мида", "вид морски охлюв", "вид ракообразно"]
+        },
+        answers: ["Marine snail", "вид морски охлюв"]
+    },
+
+    {
+        text: {
+            en: "True or false: Are starfish carnivorous?",
+            bg: "Вярно ли е, че Морските звезди са хищни?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, eat mollusks and worms", "No, eat bottom algae mainly"],
+            bg: ["Да, хранят се с мекотели и многочетинести червеи", "Не, тъй като са много бавни, се хранят основно с дънни водорасли"]
+        },
+        answers: ["Yes, eat mollusks and worms", "Да, хранят се с мекотели и многочетинести червеи"]
+    },
+
+    {
+        text: {
+            en: "Corals are:",
+            bg: "Коралите са?"
+        },
+        type: "choice",
+        options: {
+            en: ["Algae in shells", "Animal phylum with sessile lifestyle", "Marine sponges"],
+            bg: ["водорасли в черупки", "вид животни, водещи прикрепен начин", "вид морски гъби"]
+        },
+        answers: ["Animal phylum with sessile lifestyle", "вид животни, водещи прикрепен начин"]
+    },
+
+    {
+        text: {
+            en: "Largest ocean pollutant:",
+            bg: "Най-големият замърсител на Световния океан е"
+        },
+        type: "choice",
+        options: {
+            en: ["Paper", "Plastic", "Glass"],
+            bg: ["хартията", "пластмасата", "стъкло"]
+        },
+        answers: ["Plastic", "пластмасата"]
+    },
+
+    {
+        text: {
+            en: "From which country did collector Iliya Delev gather crystals and minerals?",
+            bg: "От коя е държавата, от която колекционерът г-н Илия Делев събира богат набор от кристали и минерали?"
+        },
+        type: "choice",
+        options: {
+            en: ["Greenland", "Ghana", "Brazil"],
+            bg: ["Гренландия", "Гана", "Бразилия"]
+        },
+        answers: ["Brazil", "Бразилия"]
+    },
+
+    {
+        text: {
+            en: "True or false: Is village Rosen in Strandja on an ancient volcano?",
+            bg: "Вярно ли е, че село Росен в Странджа лежи върху палеовулкан?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, known as Rosen ore field", "No, Bulgaria had no volcanoes"],
+            bg: ["Да, районът е известен като Росенско рудно поле", "Не, в България е нямало вулкани"]
+        },
+        answers: ["Yes, known as Rosen ore field", "Да, районът е известен като Росенско рудно поле"]
+    },
+
+    {
+        text: {
+            en: "Is calcite found in copper deposits?",
+            bg: "Среща ли се калцитът в медни находища?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes", "No"],
+            bg: ["Да", "Не"]
+        },
+        answers: ["Yes", "Да"]
+    },
+
+    {
+        text: {
+            en: "What is Southeast Bulgaria known for since ancient times?",
+            bg: "С добив на какво е известна Югоизточна България още от древни времена?"
+        },
+        type: "choice",
+        options: {
+            en: ["Silver", "Copper", "Diamonds"],
+            bg: ["сребро", "мед", "диаманти"]
+        },
+        answers: ["Copper", "мед"]
+    },
+
+    {
+        text: {
+            en: "What did Associate Professor Angelov study before mineralogy?",
+            bg: "С какво се е занимавал доц. Ангелов преди да започне да изучава минералологията?"
+        },
+        type: "choice",
+        options: {
+            en: ["Chemistry", "Astronomy", "Biology"],
+            bg: ["химия", "астрономия", "биология"]
+        },
+        answers: ["Biology", "биология"]
+    },
+
+    {
+        text: {
+            en: "True statements about quartz:",
+            bg: "Кои твърдения са вярни за кварцът"
+        },
+        type: "choice",
+        options: {
+            en: ["Type of transparent metal", "Mineral", "Participates in rock formation", "Origin from fallen meteorite ~550 million years ago"],
+            bg: ["той е вид прозрачен метал", "той е минерал", "участва в скалообразуването", "произходът му е паднал метеорит преди около 550 млн. год."]
+        },
+        answers: ["Mineral, Participates in rock formation", "той е минерал, участва в скалообразуването"]
+    },
+
+    {
+        text: {
+            en: "Quartz applications in technology:",
+            bg: "В кои технологични сфери има приложение кварцът"
+        },
+        type: "choice",
+        options: {
+            en: ["Metalworking", "Radio-electronics", "Optics", "All of them"],
+            bg: ["в металообработката", "в радиоелектрониката", "в оптиката", "всички"]
+        },
+        answers: ["Optics, Radio-electronics", "в оптиката, в радиоелектрониката"]
+    },
+
+    {
+        text: {
+            en: "True or false: Does opal contain water?",
+            bg: "Вярно ли е, че в минералът опал има вода?"
+        },
+        type: "choice",
+        options: {
+            en: ["Yes, can evaporate and dehydrate", "No water in rocks"],
+            bg: ["Да, в опалът има съдържание на вода", "Няма как в камъните да има вода"]
+        },
+        answers: ["Yes, can evaporate and dehydrate", "Да, в опалът има съдържание на вода"]
+    },
+
+    {
+        text: {
+            en: "Process of crystal development is called:",
+            bg: "Как се нарича процесът на развитие на един кристал?"
+        },
+        type: "choice",
+        options: {
+            en: ["Crystallotherapy", "Succession", "Crystallization", "Petrification"],
+            bg: ["кристалотерия", "сукцесия", "кристализация", "вкаменизация"]
+        },
+        answers: ["Crystallization", "кристализация"]
+    },
+
+    {
+        text: {
+            en: "What shape does a geode have?",
+            bg: "Каква форма има геода?"
+        },
+        type: "choice",
+        options: {
+            en: ["Square", "Elongated", "Oval", "Liquid without shape"],
+            bg: ["квадратна", "продълговата", "овална", "това е течност, няма форма"]
+        },
+        answers: ["Oval", "овална"]
+    },
+
+    {
+        text: {
+            en: "Which are native elements?",
+            bg: "Кои от изброените са самородни елементи?"
+        },
+        type: "choice",
+        options: {
+            en: ["Gold, clay, copper", "Gold, copper, silver", "Silver, clay, gravel"],
+            bg: ["злато, глина, мед", "злато, мед, сребро", "сребро, глина, чакъл"]
+        },
+        answers: ["Gold, copper, silver", "злато, мед, сребро"]
+    },
+
+    {
+        text: {
+            en: "Precious stones are:",
+            bg: "Кои от изброените са скъпоценни камъни?"
+        },
+        type: "choice",
+        options: {
+            en: ["Topaz, tourmaline, beryl", "Quartz, granite, diamond"],
+            bg: ["топаз, турмалин, берил", "кварц, гранит, диамант"]
+        },
+        answers: ["Topaz, tourmaline, beryl", "топаз, турмалин, берил"]
+    },
+
+    {
+        text: {
+            en: "Most common sand color on Earth:",
+            bg: "Кой е най-разпространеният цвят на пясъка на Земята?"
+        },
+        type: "choice",
+        options: {
+            en: ["Black", "White", "Yellow", "Transparent"],
+            bg: ["черен", "бяло", "жълт", "прозрачен"]
+        },
+        answers: ["Yellow", "жълт"]
+    },
+
+    {
+        text: {
+            en: "What shape is asbestos?",
+            bg: "Каква форма има азбестът"
+        },
+        type: "choice",
+        options: {
+            en: ["Fibrous", "Cubic", "Oval", "Spiral"],
+            bg: ["влакнеста", "кубовидна", "овална", "спираловидна"]
+        },
+        answers: ["Fibrous", "влакнеста"]
+    },
+
+    {
+        text: {
+            en: "Name of sea turtle:",
+            bg: "Кое е име на морска костенурка?"
+        },
+        type: "choice",
+        options: {
+            en: ["Carriage", "Phaeton", "Caretta", "Saddle"],
+            bg: ["каляска", "файтон", "карета", "седло"]
+        },
+        answers: ["Caretta", "карета"]
+    },
+
+    {
+        text: {
+            en: "Geological periods are:",
+            bg: "Кои от изброените са геоложки периоди?"
+        },
+        type: "choice",
+        options: {
+            en: ["Devonian, Silurian","Jurassic, Ordovician", "Limestone, Arial","Quaternary, Carbon", "Brittos, Devin"],
+            bg: ["девон, силур","юра, ордовик", "варовик, ариел","кватернер, карбон", "бритос, девин"]
+        },
+        answers: ["Devonian, Silurian, Jurassic, Ordovician, Quaternary, Carbon", "девон, силур, юра, ордовик, кватернер, карбон"]
+    },
+
+    {
+        text: {
+            en: "Aurelia aurita and Rhizostoma pulmo are species of:",
+            bg: "Aurelia aurita и Rhizostoma pulmo са видове..."
+        },
+        type: "choice",
+        options: {
+            en: ["Jellyfish", "Greenery", "Migratory birds", "Butterflies"],
+            bg: ["медузи", "зеленики", "прелетни птици", "пеперуди"]
+        },
+        answers: ["Jellyfish", "медузи"]
+    },
+
+    {
+        text: {
+            en: "True about mollusks:",
+            bg: "Кое е вярно за мекотелите?"
+        },
+        type: "choice",
+        options: {
+            en: ["Have head, body and foot", "Have cephalothorax and chelicerae", "Have fin and setae", "Shapeless"],
+            bg: ["имат глава, труп и крак", "имат главогръд и хелицери", "имат перка и четинки", "безформени са"]
+        },
+        answers: ["Have head, body and foot", "имат глава, труп и крак"]
+    },
+
+    {
+        text: {
+            en: "Worms are divided into:",
+            bg: "На какви се делят червеите?"
+        },
+        type: "choice",
+        options: {
+            en: ["Dry and mucous", "Many-eyed and blind", "Flat, round and segmented", "Spiny-backed and spiny-tailed"],
+            bg: ["сухи и слузести", "многоочни и слепи", "плоски, кръгли и прешленести", "шипобедрени и шипоопашати"]
+        },
+        answers: ["Flat, round and segmented", "плоски, кръгли и прешленести"]
+    },
+
+    {
+        text: {
+            en: "Devil's Claw is:",
+            bg: "Какъв вид е Дяволският нокът?"
+        },
+        type: "choice",
+        options: {
+            en: ["Endemic plant in Strandja", "Elongated fungus on decaying matter", "Crystal", "Mussel"],
+            bg: ["ендемично растение в Странджа", "издължена гъба, растяща около гнила органика", "кристал", "мида"]
+        },
+        answers: ["Mussel", "мида"]
+    },
+
+    {
+        text: {
+            en: "What is Canis lupus?",
+            bg: "Какво е Canis lupus?"
+        },
+        type: "choice",
+        options: {
+            en: ["Rapan", "Hawk", "Wolf", "Mineral mining method"],
+            bg: ["рапан", "ястреб", "вълк", "метод за добиване на минерали"]
+        },
+        answers: ["Wolf", "вълк"]
+    },
+
+    {
+        text: {
+            en: "What are ammonites?",
+            bg: "Какво са амонитите?"
+        },
+        type: "choice",
+        options: {
+            en: ["Prehistoric fungi", "Prehistoric mollusks", "Round minerals in copper mines", "Invasive moth species"],
+            bg: ["група праисторически гъби", "група праисторически мекотелите", "кръгли минерали", "инвазивни видове молци"]
+        },
+        answers: ["Prehistoric mollusks", "група праисторически мекотелите"]
+    },
+
+    {
+        text: {
+            en: "Hazelnut is:",
+            bg: "Орехчето е"
+        },
+        type: "choice",
+        options: {
+            en: ["Small flower", "Marine mussel", "Bird species", "Form from heat-treated quartz"],
+            bg: ["вид малко цвете", "вид морска мида", "вид птица", "форма образуваща се при третиране на кварцът"]
+        },
+        answers: ["Bird species", "вид птица"]
+    },
+
+    {
+        text: {
+            en: "Lancelet is:",
+            bg: "Ланцетникът е"
+        },
+        type: "choice",
+        options: {
+            en: ["Grassy plant with lance-shaped leaves", "Crustacean", "Carnivorous rodent", "Notochord animal"],
+            bg: ["тревисто растение с копиевидни листа", "ракообразно", "хищен гризач", "безчерепно хордово животно"]
+        },
+        answers: ["Notochord animal", "безчерепно хордово животно"]
+    },
+
+    {
+        text: {
+            en: "Forest Scops Owl is:",
+            bg: "Какво е Горската улулица?"
+        },
+        type: "choice",
+        options: {
+            en: ["Bird", "Shrub", "Fungus", "Rock formations"],
+            bg: ["птица", "храст", "гъба", "специфични скални образувания"]
+        },
+        answers: ["Bird", "птица"]
+    },
+
+    {
+        text: {
+            en: "What is Grain Quail?",
+            bg: "Какво е Житното пиле?"
+        },
+        type: "choice",
+        options: {
+            en: ["Small sparrow-like bird", "Minerals found after plowing", "Large grasshopper relative, relative of locusts"],
+            bg: ["дребна врабчова птица", "минерали, откриващи се по нивите", "вид голямо насекомо, родственик на скакалците"]
+        },
+        answers: ["Large grasshopper relative, relative of locusts", "вид голямо насекомо, родственик на скакалците"]
+    },
+
+    {
+        text: {
+            en: "At what age do stags shed their antlers?",
+            bg: "На колко години срандакът си сменя рогата?"
+        },
+        type: "choice",
+        options: {
+            en: ["Every 3 years", "Every year", "Only once at maturity"],
+            bg: ["на всеки 3 години", "на всяка година", "сменя ги само веднъж"]
+        },
+        answers: ["Every year", "на всяка година"]
+    }
+];
+
+        // pick 5 random questions
+        function getRandomQuestions(arr,n){
+            const copy = arr.slice().sort(()=>Math.random()-0.5);
+            return copy.slice(0, Math.min(n, copy.length));
+        }
+
+        let selectedQuestions = getRandomQuestions(questionList,5);
+        let currentQuestion = 0;
+        let answers = Array(selectedQuestions.length).fill('');
+        updateLangUI();
+
+        function showQuestion(idx){
+            const q = selectedQuestions[idx];
+            const area = document.getElementById('question-area');
+            let html = `<div class="question"><label>${idx+1}. ${q.text[lang]}</label>`;
+            if(q.type === "choice"){
+                html += `<div style="color:#004d40;margin:.5rem 0">${translations[lang].options}</div>`;
+                q.options[lang].forEach((opt,i)=>{
+                    html += `<div class="option-row"><input type="radio" id="opt${i}" name="q" value="${opt}" ${answers[idx]===opt ? 'checked':''}><label for="opt${i}">${opt}</label></div>`;
+                });
+            } else {
+                html += `<div style="margin-top:.6rem"><input type="text" id="q" name="q" autocomplete="off" value="${answers[idx] ? answers[idx] : ''}"></div>`;
+            }
+            html += `</div>`;
+            area.innerHTML = html;
+            // update progress
+            updateProgressBar(idx, selectedQuestions.length);
+
+            // wire inputs
+            if(q.type === "choice"){
+                const radios = document.querySelectorAll('input[name="q"]');
+                radios.forEach(r=>{
+                    r.addEventListener('change', ()=>{
+                        document.getElementById('next-btn').disabled = !document.querySelector('input[name="q"]:checked');
+                        document.getElementById('submit-btn').disabled = !document.querySelector('input[name="q"]:checked');
+                    });
+                });
+                document.getElementById('next-btn').disabled = !document.querySelector('input[name="q"]:checked');
+                document.getElementById('submit-btn').disabled = !document.querySelector('input[name="q"]:checked');
+            } else {
+                const input = document.getElementById('q');
+                input.focus();
+                input.addEventListener('input', ()=>{
+                    const ok = input.value.trim().length>0;
+                    document.getElementById('next-btn').disabled = !ok;
+                    document.getElementById('submit-btn').disabled = !ok;
+                });
+                const ok = input.value.trim().length>0;
+                document.getElementById('next-btn').disabled = !ok;
+                document.getElementById('submit-btn').disabled = !ok;
+            }
+
+            document.getElementById('next-btn').style.display = (idx < selectedQuestions.length-1) ? 'inline-block' : 'none';
+            document.getElementById('submit-btn').style.display = (idx === selectedQuestions.length-1) ? 'inline-block' : 'none';
+            updateLangUI();
+        }
+
+        function updateProgressBar(current,total){
+            const pct = total===0?0:Math.round(((current+1)/total)*100);
+            document.getElementById('progress-bar').style.width = pct + '%';
+        }
+
+        document.getElementById('next-btn').addEventListener('click', ()=>{
+            const qObj = selectedQuestions[currentQuestion];
+            let answer;
+            if(qObj.type === "choice"){
+                const checked = document.querySelector('input[name="q"]:checked');
+                if(!checked) return;
+                answer = checked.value;
+            } else {
+                const input = document.getElementById('q');
+                if(!input || !input.value.trim()){ input && input.focus(); return; }
+                answer = input.value.trim();
+            }
+            answers[currentQuestion] = answer;
+            currentQuestion++;
+            showQuestion(currentQuestion);
+        });
+
+        // Enter key handling: move to next question if not last, otherwise allow submit
+        document.getElementById('quiz-form').addEventListener('keydown', function(e){
+            if(e.key === 'Enter'){
+                const active = document.activeElement;
+                // only intercept when focus inside text input or radio/checkbox
+                if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')){
+                    if(currentQuestion < selectedQuestions.length - 1){
+                        e.preventDefault();
+                        document.getElementById('next-btn').click();
+                    }
+                    // else allow submit
+                }
+            }
+        });
+
+        document.getElementById('quiz-form').addEventListener('submit', function(e){
+            e.preventDefault();
+            const qObj = selectedQuestions[currentQuestion];
+            let answer;
+            if(qObj.type === "choice"){
+                const checked = document.querySelector('input[name="q"]:checked');
+                if(!checked) return;
+                answer = checked.value;
+            } else {
+                const input = document.getElementById('q');
+                if(!input || !input.value.trim()){ input && input.focus(); return; }
+                answer = input.value.trim();
+            }
+            answers[currentQuestion] = answer;
+
+            // save correct answers and user answers (AM-specific keys)
+            const correct = selectedQuestions.map(q=>q.answers);
+            localStorage.setItem('correctAnswersAM', JSON.stringify(correct));
+            localStorage.setItem('userAnswersAM', JSON.stringify(answers));
+            localStorage.setItem('language', lang);
+            window.location.href = 'quizResultsAM.html';
+            
+        });
+
+        // initial render
+        showQuestion(currentQuestion);
+        updateLangUI();
+    </script>
+</body>
+</html>

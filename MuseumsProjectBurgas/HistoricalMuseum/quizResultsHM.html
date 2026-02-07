@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Historical Museum — Results</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  html,body{height:100%}
+  body{margin:0;display:flex;align-items:center;justify-content:center;font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:linear-gradient(135deg,#fff7ec 0%,#efe6d6 100%)}
+  .box{background:#fff;padding:1.8rem;border-radius:14px;max-width:620px;width:100%;box-shadow:0 10px 28px rgba(0,0,0,.10);position:relative}
+  .lang{position:absolute;top:12px;right:12px;display:flex;gap:.4rem}
+  .lang button{background:#fff3e0;border:2px solid #e0a169;padding:.3rem .6rem;border-radius:8px;cursor:pointer}
+  .lang button.active{background:#ffcc80}
+  h2{color:#6b3f00;margin:0 0 .6rem 0;text-align:center}
+  .score{font-size:2rem;color:#4b2e13;text-align:center;margin:.6rem 0}
+  .msg{color:#6b3f00;text-align:center;margin:.6rem 0}
+  .details{margin-top:1rem;background:#fff7f0;padding:1rem;border-radius:8px;max-height:260px;overflow:auto}
+  .btn{display:block;margin:1rem auto 0 auto;padding:.6rem 1.2rem;border-radius:10px;border:none;background:linear-gradient(90deg,#c77,#e0a169);color:#fff;cursor:pointer;font-weight:600}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="lang">
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+      <button id="btn-bg" onclick="setLang('bg')">BG</button>
+    </div>
+
+    <h2 id="results-title">Quiz Results</h2>
+    <div class="score" id="score"></div>
+    <div class="msg" id="message"></div>
+
+    <div class="details" id="details" style="display:none"></div>
+
+    <button class="btn" id="restart">Back to start</button>
+  </div>
+
+<script>
+const translations = {
+  en:{
+    results:"Quiz Results",
+    wellDone:"Perfect! You're a true historian! 🎉",
+    messages:[
+      { min:0, max:20, text:"Don't worry! 💪" },
+      { min:20, max:40, text:"Good effort! 📚" },
+      { min:40, max:60, text:"Nice work! 🌟" },
+      { min:60, max:80, text:"Very good! 🚀" },
+      { min:80, max:100, text:"Excellent! You really know your stuff! 👏" }
+    ],
+    back:"Back to start",
+    mistakes:"Your mistakes:",
+    yourAnswer:"Your answer:",
+    correctAnswer:"Correct answer:"
+  },
+  bg:{
+    results:"Резултати от викторината",
+    wellDone:"Перфектно! Вие сте истински историк! 🎉",
+    messages:[
+      { min:0, max:20, text:"Не се притеснявайте, човек не се учи за един ден! 💪" },
+      { min:20, max:40, text:"Добър опит! 📚" },
+      { min:40, max:60, text:"Почти успяхте! 🌟" },
+      { min:60, max:80, text:"Много добър резултат! 🚀" },
+      { min:80, max:100, text:"Отлично! Наистина сте научили доста! 👏" }
+    ],
+    back:"Назад към началото",
+    mistakes:"Вашите грешки:",
+    yourAnswer:"Вашият отговор:",
+    correctAnswer:"Правилен отговор:"
+  }
+};
+
+let lang = localStorage.getItem('language') || 'en';
+function setLang(l){ lang = l; localStorage.setItem('language', l); render(); }
+
+document.getElementById('restart').addEventListener('click', ()=>{
+  localStorage.removeItem('correctAnswersHM');
+  localStorage.removeItem('userAnswersHM');
+  window.location.href = 'welcomeHistoricalMuseum.html';
+});
+
+function normalize(s){ return (s||"").toString().trim().toLowerCase(); }
+
+function render(){
+  document.getElementById('btn-en').classList.toggle('active', lang==='en');
+  document.getElementById('btn-bg').classList.toggle('active', lang==='bg');
+  document.getElementById('results-title').textContent = translations[lang].results;
+  document.getElementById('restart').textContent = translations[lang].back;
+
+  const correct = JSON.parse(localStorage.getItem('correctAnswersHM') || '[]');
+  const user = JSON.parse(localStorage.getItem('userAnswersHM') || '[]');
+  let correctCount = 0;
+  const mistakes = [];
+
+  for(let i=0;i<correct.length;i++){
+    const accepted = correct[i] || [];
+    const u = user[i] || "";
+    const ok = accepted.some(a => normalize(a) === normalize(u));
+    if(ok) {
+      correctCount++;
+    } else {
+      mistakes.push({n:i+1, user:u, correct:accepted});
+    }
+  }
+
+  document.getElementById('score').textContent = `${correctCount} / ${correct.length}`;
+  
+  let messageText;
+  if(correctCount === correct.length) {
+    messageText = translations[lang].wellDone;
+  } else {
+    const percentage = (correctCount / correct.length) * 100;
+    const msg = translations[lang].messages.find(m => percentage >= m.min && percentage < m.max);
+    messageText = msg ? msg.text : translations[lang].messages[0].text;
+  }
+  document.getElementById('message').textContent = messageText;
+
+  if(mistakes.length){
+    const el = document.getElementById('details');
+    el.style.display = 'block';
+    el.innerHTML = `<strong>${translations[lang].mistakes}</strong><br><br>` + mistakes.map(m=>{
+      return `<div style="margin-bottom:.8rem;padding:.6rem;background:#fff;border-left:3px solid #e0a169;border-radius:4px"><strong>#${m.n}</strong><br>${translations[lang].yourAnswer} <em>${m.user||'—'}</em><br>${translations[lang].correctAnswer} <em>${m.correct.join(', ')}</em></div>`;
+    }).join('');
+  } else {
+    document.getElementById('details').style.display = 'none';
+  }
+}
+
+/* initial render */
+render();
+</script>
